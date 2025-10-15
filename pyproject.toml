@@ -1,0 +1,157 @@
+[project]
+name = "u2demo-clearing-engine"
+version = "0.1.0"
+description = "U2demo clearing algorithm"
+authors = [{ name = "Ariel Waserhole", email = "ariel.waserhole@artelys.com" }]
+
+requires-python = ">=3.10,<=3.13"
+dependencies = [
+    "pydantic>=2.11.5",
+    "loguru~=0.7.2",
+    "pyomo",
+    "xpress>=9.5,<9.6",
+    "pyyaml>=6.0.2,<7",
+    "pydantic-2-mermaid",
+    "fastapi",
+    "uvicorn"
+]
+
+
+[tool.uv]
+index-strategy = "unsafe-best-match"
+
+
+[dependency-groups]
+doc = [
+    "sphinx~=5.3.0",
+    "sphinx_bootstrap_theme~=0.8.1",
+    "sphinx-gallery==0.7.0",
+    "sphinx_autodoc_typehints~=1.23.0",
+    "sphinxcontrib-programoutput~=0.17.0",
+    "pydata-sphinx-theme~=0.15.4",
+    "json-schema-for-humans~=1.0.2",
+    "sphinx_design~=0.6.0",
+    "sphinx_rtd_theme~=2.0.0",
+    "autodocsumm~=0.2.12",
+    "docutils~=0.16",
+    "nbsphinx==0.9.3",
+    "pypandoc==1.13",
+    "sphinx_copybutton==0.5.2",
+    #"sphinx-autodoc-typehints",
+]
+dev = [
+    "pytest>=8.3.2",
+    "pytest-cov>=6.0.0",
+    "coverage>=7.6.1",
+    "ruff>=0.8.0",
+    "python-dotenv>=1.0.1,<2",
+    "flake8>=7",
+    "pylint>=3",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build]
+include = ["u2demo-clearing-engine/**"]
+
+
+[tool.coverage.run]
+command_line = "-m pytest"
+
+[tool.coverage.report]
+include = ["u2demo-clearing-engine/**/*.py"]
+show_missing = true
+
+[[tool.uv.index]]
+url = "https://pypi.org/simple/"
+default = true
+
+#[[tool.uv.index]]
+#url = "https://artifactory.artelys.com/artifactory/api/pypi/pypi-artelys/simple"
+
+[tool.ruff]
+line-length = 120
+
+[tool.ruff.lint]
+ignore = [
+    "B028",
+    "ANN002",
+    "ANN003",
+    "ANN206",
+    "C901",
+    "D100",
+    "D104",
+    "PT",
+    "PTH",
+    "PTH",
+    "T20",
+    "FBT001",
+    "FBT002",
+    "PD",
+    "PLR2004",
+    "PLR0912",
+    "PLR0915",
+    "PLR0913",
+    "PLR0911",
+    "RUF",
+    "S105",
+    "D101",
+    "D102",
+    "D103",
+    "ANN201",
+    "ANN202",
+    "PERF401",
+    "TC003",
+    "RET504",
+    "ERA001",
+    "DTZ005",
+    "D105",
+    "D107",
+    "ANN001",
+    "ANN401",
+    "D211",
+    "D213",
+    "D205",
+    "D400",
+    "D404",
+    "D415",
+    "D401",
+    "D106",
+    "G004",
+    "TC001",
+    "TC002",
+    "COM812",
+    "D203",
+    "ISC001",
+    "COM812",
+    "FIX002",
+    "TD002",
+    "TD003",
+    "DTZ001",
+    "TRY300",
+    "EM102",
+    "ANN204",
+    "TD004",
+    "TRY003",
+    "D417",
+    "EM101",
+    "E501"
+]
+select = [
+    "ALL"]
+
+[tool.ruff.lint.per-file-ignores]
+"__init__.py" = ["E402", "F401", "F403"]
+"tests/*" = [
+    "D",
+    "ANN",
+    "S",
+    "SLF001",
+    "PLW",
+    "N806",
+    "FBT003",
+    "ARG",
+]
+
