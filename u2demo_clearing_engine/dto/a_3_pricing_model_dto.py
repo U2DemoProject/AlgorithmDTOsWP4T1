@@ -11,30 +11,11 @@ from u2demo_clearing_engine.dto.algorithm_libraries.commons_dto import (
 )
 
 # Classes specific to model 3
-"""
-Following classes not needed?
-class OfftakeOrder(BaseModel): 
-    timestep: datetime      
-    offtake_volume: float 
-
-class InjectionOrder(BaseModel): 
-    timestep: datetime
-    injection_volume: float  
-
-class OfftakePrice(BaseModel): 
-    timestep: datetime
-    value: float
-
-class InjectionPrice(BaseModel):
-    timestep: datetime
-    value: float  
-"""
 
 
-class RetailPrice(BaseModel):
-    # timestep: datetime            #Implied in the other arguments?
-    injection_price: TimeValue
-    offtake_price: TimeValue
+class RetailPrices(BaseModel):
+    injection_price: list[TimeValue]
+    offtake_price: list[TimeValue]
 
 
 class PricingRule(StrEnum):
@@ -45,11 +26,9 @@ class PricingRule(StrEnum):
 class PricingModelInput(OptimizationInstance):
     time: TimeParameters
     pricing_rule: PricingRule
-    loads: list[TimeValue]  # [OfftakeOrder]
-    productions: list[
-        TimeValue
-    ]  # [InjectionOrder] #should we link to the devices? since it can be forecasted by the CM, maybe different?
-    prices: list[RetailPrice]
+    loads: list[TimeValue]
+    productions: list[TimeValue]
+    prices: RetailPrices
 
 
 # Output of algorithm
@@ -63,4 +42,4 @@ class BillingReprocessing(BaseModel):
 #  The same algo is ran twice (with forecast and realized values)
 class PricingModelOutput(OptimizationInstance):
     internal_prices: list[TimeValue]
-    billing: list[BillingReprocessing]  # not sure if it should be here or as a post-process
+    billing: list[BillingReprocessing]

@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from datetime import datetime
+
 from pydantic import BaseModel
 
 from u2demo_clearing_engine.dto.algorithm_libraries.commons_dispatch_optimization_dto import (
@@ -25,8 +27,10 @@ class CommunityContract(BaseModel):
 
 class DecisionIndividualOptimisationInput(OptimizationInstance):
     household: Household
-    community_contract: CommunityContract
-    objectives: list[Objective]
+    community_contract: CommunityContract | None = None
+    objectives: list[Objective] | None = None
+    start_datetime: datetime | None = None
+    end_datetime: datetime | None = None
 
 
 # -------- OUTPUT STRUCTURES -------- #

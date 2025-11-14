@@ -5,33 +5,20 @@ classDiagram
         prices: list[TimeValue]
     }
 
-    class Objective {
-        name: ObjectiveName
-        weight: float | None = 1
-    }
-
-    class DecisionIndividualOptimisationInput {
-        household: Household
-        community_contract: CommunityContract
-        objectives: list[Objective]
-    }
-
     class OptimizationInstance {
         instance_id: str
     }
 
-    class Schedule {
-        schedule: list[TimeValue]
+    class ExternalInteractions {
+        grid_offtake_volume: Schedule
+        grid_injection_volume: Schedule
+        community_offtake_volume: Schedule
+        community_injection_volume: Schedule
     }
 
-    class AssetSchedule {
-        asset_id: str
-        direction: Direction
-    }
-
-    class Household {
-        community_members: list[CommunityMember]
-        assets: list[Asset]
+    class DecisionIndividualOptimisationOutput {
+        dispatches: list[AssetSchedule]
+        external_interactions: ExternalInteractions
     }
 
     class CommunityContract {
@@ -41,16 +28,31 @@ classDiagram
         max_offtake_community: Schedule
     }
 
-    class DecisionIndividualOptimisationOutput {
-        dispatches: list[AssetSchedule]
-        external_interactions: ExternalInteractions
+    class AssetSchedule {
+        asset_id: str
+        direction: Direction
     }
 
-    class ExternalInteractions {
-        grid_offtake_volume: Schedule
-        grid_injection_volume: Schedule
-        community_offtake_volume: Schedule
-        community_injection_volume: Schedule
+    class Objective {
+        name: ObjectiveName
+        weight: float | None = 1
+    }
+
+    class Household {
+        community_members: list[CommunityMember]
+        assets: list[Asset]
+    }
+
+    class DecisionIndividualOptimisationInput {
+        household: Household
+        community_contract: CommunityContract | None = None
+        objectives: list[Objective] | None = None
+        start_datetime: datetime | None = None
+        end_datetime: datetime | None = None
+    }
+
+    class Schedule {
+        schedule: list[TimeValue]
     }
 
 

@@ -2,7 +2,7 @@
 
 ## Purpose
 This repository contains the Data Transfer Objects (DTO) used to standardise the model developments in U2Demo. These DTOs are organised by algorithm, as outlined in Deliverable D4.1, with one file per algorithm, found in u2demo_clearing_engine/dto. These algorithms also share some commonalities, which are stored in the commons files under u2demo_clearing_engine/dto/algorithm_libraries. 
-In each DTO, the attributes are specified using pydantic syntax, with eventually some attribute constraints included in the attribute definition. For example, for a positive attribute, the constraint attribute >= 0 is included in the attribute definition.
+In each DTO, the attributes are specified using Pydantic syntax, with eventually some attribute constraints included in the attribute definition. For example, for a positive attribute, the constraint attribute >= 0 is included in the attribute definition.
 Object Oriented Programming principles are followed as much as possible, with inheritence between classes whenever relevant, in order to structure the DTO definitions. 
 
 

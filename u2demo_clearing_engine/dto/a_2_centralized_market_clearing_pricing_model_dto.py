@@ -4,16 +4,6 @@ from abc import ABC, abstractmethod
 
 from pydantic import BaseModel, Field
 
-from u2demo_clearing_engine.dto.algorithm_libraries.commons_dto import OptimizationInstance
-
-
-class PricingModelInput(OptimizationInstance):
-    pass
-
-
-class PricingModelOutput(OptimizationInstance):
-    pass
-
 
 class ClearingPriceModel(BaseModel, ABC):
     @abstractmethod

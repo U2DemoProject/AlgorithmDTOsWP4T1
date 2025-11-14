@@ -47,6 +47,14 @@ class ProductDifferentiationParcel(BaseModel):
         )
 
 
+class SharedAvailability(
+    BaseModel
+):  # Availability is the aggregated value of the load_forecast or production_forecast for all loads linked to the Peer.
+    min_availability: list[TimeValue]
+    max_availability: list[TimeValue]
+    direction: bool
+
+
 class Peer(CommunityMember):
     # ID contained in CommunityMember
     # selling_price to grid contained in Contract, selling price to others contained in cost function (Quadratic cost + Product Differentiation)
@@ -58,13 +66,7 @@ class Peer(CommunityMember):
     product_differentiation_parcel: ProductDifferentiationParcel
     trading_partners: set[str]
     flexibility_rate: float = Field(gt=0, lt=1)
-
-    load_demand_forecast: list[float] = Field(
-        gt=0, min_length=1
-    )  # Peer load_demand_forecast is the aggregated value of the load_forecast for all loads linked to the Peer.
-    der_production_forecast: list[float] = Field(
-        gt=0, min_length=1
-    )  # Peer der_production_forecast is the aggregated value of the production_forecast for all production assets linked to the Peer.
+    availability: SharedAvailability
 
 
 class CentralizedDispatchWithP2PModelInput(OptimizationInstance):
@@ -80,8 +82,9 @@ class CentralizedDispatchWithP2PModelInput(OptimizationInstance):
 
 
 class PeerSharingCoefficient(BaseModel):
-    id: str  # ID of the peers with whom energy is exchanged
+    id: str  # ID of the peer with whom energy is exchanged
     sharing_coefficient: float  # Between -1 and 1, with negative values representing consumption flow, and positive values representing production flows.
+    sharing_price: float  # Price of the dual for the exchange along the considered branch.
 
 
 class PeerResult(BaseModel):

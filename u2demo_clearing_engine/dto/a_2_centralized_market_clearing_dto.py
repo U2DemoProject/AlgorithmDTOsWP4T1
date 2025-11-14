@@ -1,8 +1,12 @@
 from __future__ import annotations
 
+from datetime import datetime
+from enum import StrEnum
+
 from pydantic import BaseModel, Field, model_validator
 from typing_extensions import Self
 
+from u2demo_clearing_engine.dto.a_2_centralized_market_clearing_pricing_model_dto import ClearingPriceModel
 from u2demo_clearing_engine.dto.algorithm_libraries.commons_dto import ObjectiveName, OptimizationInstance
 
 # Classes specific to model 4
@@ -22,10 +26,9 @@ class OrderStep(BaseModel):  # Simple single-step bid structure
         return self
 
 
-class TimeStepOrder(BaseModel):
+class OrderCurve(BaseModel):
     order_id: str = Field(..., description="Order identifier")
     linked_order_id: str | None = Field(default=None, description="Linked order identifier")
-    timestep: int = Field(..., ge=0, description="Timestep index of the order submission")
     price_volume_curve: list[OrderStep]
 
     def check_price_volume_curve(self, is_offer: bool):
@@ -33,21 +36,39 @@ class TimeStepOrder(BaseModel):
             prev_price = self.price_volume_curve[i].price
             next_price = self.price_volume_curve[i + 1].price
             if is_offer and prev_price >= next_price:
-                raise ValueError(
-                    f"Volume curve prices of timestep offer order {self.order_id} are not strictly increasing."
-                )
+                raise ValueError(f"Volume curve prices of offer order {self.order_id} are not strictly increasing.")
             if not is_offer and prev_price <= next_price:
-                raise ValueError(
-                    f"Volume curve prices of timestep demand order {self.order_id} are not strictly decreasing."
-                )
+                raise ValueError(f"Volume curve prices of demand order {self.order_id} are not strictly decreasing.")
 
     @model_validator(mode="after")
     def check_step_orders(self) -> Self:
         if len(self.price_volume_curve) == 0:
-            raise ValueError(f"Timestep order {self.order_id} has no step order.")
-        if self.price_volume_curve[0].volume_min == 0:
-            raise ValueError(f"Minimum volume of first price volume curve of timestep order {self.order_id} is null.")
+            raise ValueError(f"Order curve {self.order_id} has no step order.")
         return self
+
+
+class LinkedOrderRelations(StrEnum):
+    PARENT = "parent"
+    CHILD = "child"
+    EXTENDED_PARENT = "extended-parent"
+    EXTENDED_CHILD = "extended-child"
+    LOOP_BUY = "loop-buy"
+    LOOP_SELL = "loop-sell"
+    FLEXIBLE = "flexible"
+
+
+class BlockOrder(OrderCurve):
+    timesteps: list[datetime] = Field(..., description="Timestep indexes included in the block order submission")
+    relation: LinkedOrderRelations
+
+
+class FlexibleBlockOrder(BlockOrder):
+    block_start: datetime | None
+    block_end: datetime | None
+
+
+class TimeStepOrder(OrderCurve):
+    timestep: datetime = Field(..., description="Timestep index of the timestep order submission")
 
 
 class Order(BaseModel):
@@ -71,8 +92,17 @@ class Order(BaseModel):
         return 2 * (self.is_demand - 0.5)
 
 
+class ObjectiveRanking(BaseModel):
+    name: ObjectiveName
+    rank: int
+    slack: float = 1.0
+    direction: bool = None
+
+
 class MarketClearingInput(OptimizationInstance):
     orders: list[Order]
+    objective_ranks: list[ObjectiveRanking] | None = None
+    clearing_price_model: ClearingPriceModel | None = None
 
 
 # Outputs of class
@@ -90,4 +120,3 @@ class ClearedOrder(BaseModel):
 class MarketClearingOutput(OptimizationInstance):
     cleared_orders: list[ClearedOrder]
     clearing_price: list[float | None]
-    objective_values: dict[ObjectiveName, float]

@@ -1,11 +1,19 @@
 ```mermaid
 classDiagram
 
-    class PeerResult {
-        id: str
-        load_profile: list[TimeValue]
-        production_profile: list[TimeValue]
-        sharing_distribution: list[PeerSharingCoefficient]
+    class OptimizationInstance {
+        instance_id: str
+    }
+
+    class TimeParameters {
+        timestep_minutes: int
+        horizon_hours: int
+        scheduling_time: datetime
+    }
+
+    class CentralizedDispatchWithP2PModelInput {
+        time_parameters: TimeParameters = timestep_minutes=15 horizon_hours=24 scheduling_time=datetime.datetime(2025, 11, 14, 8, 57, 4, 34951)
+        peers: list[Peer]
     }
 
     class CentralizedDispatchWithP2PModelOutput {
@@ -13,8 +21,9 @@ classDiagram
         electricity_prices: list[TimeValue]
     }
 
-    class OptimizationInstance {
-        instance_id: str
+    class TimeValue {
+        time: datetime
+        value: float
     }
 
     class CommunityMember {
@@ -22,26 +31,29 @@ classDiagram
         meters: list[Meter]
     }
 
-    class TimeValue {
-        time: datetime
-        value: float
-    }
-
-    class Asset {
-        id: str
-        meter: Meter
-        p_min_w: float
-        p_max_w: float
-        context: dict = dict
-    }
-
     class Criterion {
         <<Enumeration>>
     }
 
-    class CentralizedDispatchWithP2PModelInput {
-        time_parameters: TimeParameters = timestep_minutes=15 horizon_hours=24 scheduling_time=datetime.datetime(2025, 10, 15, 12, 11, 17, 56806)
-        peers: list[Peer]
+    class QuadraticCostFunction {
+        a: float
+        b: float
+        c: float
+    }
+
+    class Asset {
+        id: str
+        meter: Meter | None = None
+        p_min_kw: float | None = None
+        p_max_kw: float | None = None
+        context: dict = dict
+    }
+
+    class PeerResult {
+        id: str
+        load_profile: list[TimeValue]
+        production_profile: list[TimeValue]
+        sharing_distribution: list[PeerSharingCoefficient]
     }
 
     class ProductDifferentiationParcel {
@@ -56,30 +68,24 @@ classDiagram
         product_differentiation_parcel: ProductDifferentiationParcel
         trading_partners: set[str]
         flexibility_rate: float
-        load_demand_forecast: list[float]
-        der_production_forecast: list[float]
+        availability: SharedAvailability
     }
 
-    class TimeParameters {
-        timestep_minutes: int
-        horizon_hours: int
-        scheduling_time: datetime
+    class SharedAvailability {
+        min_availability: list[TimeValue]
+        max_availability: list[TimeValue]
+        direction: bool
     }
 
     class PeerSharingCoefficient {
         id: str
         sharing_coefficient: float
-    }
-
-    class QuadraticCostFunction {
-        a: float
-        b: float
-        c: float
+        sharing_price: float
     }
 
 
     CommunityMember <|-- Peer
-    OptimizationInstance <|-- CentralizedDispatchWithP2PModelInput
     OptimizationInstance <|-- CentralizedDispatchWithP2PModelOutput
+    OptimizationInstance <|-- CentralizedDispatchWithP2PModelInput
 
 ```

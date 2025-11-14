@@ -3,7 +3,7 @@ from __future__ import annotations
 from datetime import datetime
 from enum import StrEnum
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 
 
 class OptimizationInstance(BaseModel):
@@ -46,25 +46,35 @@ class ContractCategory(StrEnum):
 
 
 class Supplier(BaseModel):
-    category: ContractCategory
     supply_prices: Prices
     resale_prices: Prices
-    capacity_tariffs: Prices
-    max_power_consumed_kw: float | None = None  # These set the grid connection capacity limit
-    max_power_injected_kw: float | None = None  # These set the grid connection capacity limit
+    capacity_tariffs: Prices | None = None
 
 
 class Contract(BaseModel):
+    model_config = ConfigDict(frozen=True)
+    category: ContractCategory
     id: str
     supplier: Supplier
-    linked_distribution_point: str | None = None
+    max_power_consumed_kw: float | None = None  # These set the grid connection capacity limit
+    max_power_injected_kw: float | None = None  # These set the grid connection capacity limit
+
+    def __hash__(self):
+        # Only hash by id
+        return hash(self.id)
+
+
+class ContractShare(BaseModel):
+    contract_id: str
+    share: float
 
 
 class Meter(BaseModel):
     id: str
-    contract_id: str
-    power_kw: list[TimeValue]
-    contract: Contract
+    linked_distribution_point: str | None = None
+    contracts: list[Contract]
+    contract_shares: list[ContractShare] | None = None
+    power_kw: list[TimeValue] | None = None
 
 
 class CommunityMember(BaseModel):

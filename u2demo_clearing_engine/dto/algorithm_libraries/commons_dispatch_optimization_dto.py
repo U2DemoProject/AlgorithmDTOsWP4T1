@@ -16,9 +16,9 @@ from u2demo_clearing_engine.dto.algorithm_libraries.commons_dto import (
 
 class Asset(BaseModel):
     id: str
-    meter: Meter
-    p_min_w: float
-    p_max_w: float
+    meter: Meter | None = None
+    p_min_kw: float | None = None
+    p_max_kw: float | None = None
 
     context: dict = Field(
         default_factory=dict
@@ -31,7 +31,7 @@ class Asset(BaseModel):
 
 
 class VariableAsset(Asset):
-    forecasted_profile: Forecast
+    forecasted_profile: Forecast | None = None
 
 
 # FlexAvailability specifies whether an asset is available to provide flexibility or not at each timestep.
@@ -41,41 +41,43 @@ class FlexAvailability(BaseModel):
 
 
 class DispatchAsset(Asset):
-    auto_control: bool
-    ramp_rate_w_per_step: float | None = None
+    auto_control: bool | None = None
+    ramp_rate_kw_per_step: float | None = None
     min_on_duration: float | None = None
     min_off_duration: float | None = None
-    availability_flex: list[FlexAvailability]
+    availability_flex: list[FlexAvailability] | None = None
 
 
 class FlexibleLoadAsset(DispatchAsset):
-    total_expected_energy_consumption: float
-    baseline_forecast: (
-        Forecast  # Expected operational schedule if no community redispatch is done. For settlement algorithms,
+    total_expected_energy_consumption: float | None = None
+    baseline_forecast: Forecast | None = (
+        None  # Expected operational schedule if no community redispatch is done. For settlement algorithms,  # the forecast is deterministic and corresponds to the physically dispatched schedule.
     )
-    # the forecast is deterministic and corresponds to the physically dispatched schedule.
+    weight_flexible: float | None = None
 
 
 class NonFlexibleLoadAsset(VariableAsset):
-    pass
+    load: list[TimeValue]
 
 
 class StorageDevice(DispatchAsset):
     max_cycles: int
     charge_efficiency: float | None = 1.0  # Same value used for discharge efficiency.
     self_discharge_rate: float | None = 0.0
-    storage_capacity: float = Field(..., ge=0, description="Maximum energy storage capacity")
-    soc_min: float | None = 0.0
-    soc_max: float | None = 1.0
-    soc: float | None = (
+    storage_capacity: float = Field(..., ge=0, description="Maximum energy storage capacity in kW")
+    soc_min: float = 0.0
+    soc_max: float = 1.0
+    soc_init: float = (
         0.0  # Value chosen at object instantiation corresponds to initial state of charge on object creation.
     )
 
-    # Check that soc is between soc_min and soc_max on model creation.
+    # Check that soc_init is between soc_min and soc_max on model creation.
     @model_validator(mode="after")
     def check_bounds(self):
-        if not (self.soc_min < self.soc < self.soc_max):
-            raise ValueError(f" ({self.soc}) must be higher than ({self.soc_min}) and lower than ({self.soc_max})")
+        if not (self.soc_min <= self.soc_init <= self.soc_max):
+            raise ValueError(
+                f" ({self.soc_init}) must be higher or equal than ({self.soc_min}) and lower or equal than ({self.soc_max})"
+            )
         return self
 
 
@@ -114,9 +116,16 @@ class AssetSchedule(Schedule):
     direction: Direction  # An asset which can both produce and consume (e.g. battery) will have two asset schedules associated with it, one for production, one for consumption.
 
 
+class SocValue(BaseModel):
+    time: datetime
+    value: float
+    asset_id: str
+
+
 class BatteryStorage(StorageDevice):
     weight_cycling: float
-    annualized_investment_cost: float
+    t_target: datetime  # Time by which the minimum target SoC must be achieved
+    soc_target: float  # Minimum target SoC
 
     def update_from_context(self):
         # Timestep probably can be extracted from somewhere else, doesn't have to be in asset.
@@ -129,22 +138,21 @@ class BatteryStorage(StorageDevice):
     def soc_update(
         self,
         power: float,
+        soc: float,
         dt: float,
     ) -> float:  # No typing set, to allow different power object types to be used with this class.
-        self.soc = (
-            1 - self.self_discharge_efficiency
-        ) * self.soc - power * dt * self.charge_efficiency / self.storage_capacity
-        return self.soc
+        soc = (1 - self.self_discharge_efficiency) * soc - power * dt * self.charge_efficiency / self.storage_capacity
+        return soc
+
+
+class ElectricVehicleCharger(FlexibleLoadAsset):
+    id: str
+    c_max: float  # Maximum charging capacity of the EV charger
 
 
 class ElectricVehicle(BatteryStorage):
+    charger: ElectricVehicleCharger
     weight_comfort: float
-    target_soc: (
-        float  # Based on the target_soc and the soc value of the battery at car arrival time (updated automatically),
-    )
-    # the total energy demand (total_expected_energy_consumption) can be calculated.
-    time_target_soc: datetime  # Handle timezones
-    # Availability start and end times are specified by the FlexAvailability attribute of the DispatchAsset specified in commons_dispatch_optimization.
 
 
 class HVAC(FlexibleLoadAsset):
@@ -156,7 +164,6 @@ class HVAC(FlexibleLoadAsset):
     efficiency_factor: float  # HVAC efficiency factor
     weight_comfort: float
     outdoor_temp: list[TimeValue] = Field(default_factory=list)
-    annualized_investment_cost: float
 
     def update_from_context(self):
         """Refresh derived attributes from the current context"""
@@ -181,12 +188,3 @@ class HVAC(FlexibleLoadAsset):
 class PV(VariableProductionAsset):
     rated_capacity: float  # Installed PV capacity (in kW)
     weight_curtailment: float  # Cost of solar curtailment
-    irradiance: list[TimeValue] = Field(default_factory=list)
-    annualized_investment_cost: float
-
-    def update_from_context(self):
-        """Refresh derived attributes from the current context"""
-        try:
-            self.irradiance = self.context["irradiance"]
-        except KeyError:
-            log.error("Missing irradiance variable in PV asset.")
