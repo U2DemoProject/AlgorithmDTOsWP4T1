@@ -1,17 +1,16 @@
-
 import pydantic_mermaid.pydantic_parser as pp
 from pydantic_mermaid import MermaidGenerator, Relations
 
 from u2demo_clearing_engine.dto import (
-    a_1_1_centralized_dispatch_cems_dto,
-    a_1_2_centralized_dispatch_peer_to_peer_dto,
-    a_1_3_centralized_dispatch_collective_benefit_allocation_dto,
-    a_1_4_decision_individual_portfolio_optimization_dto,
+    a_1_1_energy_management_system_community_dto,
+    a_1_2_energy_management_system_peer_to_peer_dto,
+    a_1_3_energy_management_system_collective_benefit_allocation_dto,
+    a_1_4_energy_management_system_individual_portfolio_dto,
     a_2_centralized_market_clearing_dto,
-    a_3_pricing_model_dto,
-    a_4_heuristic_settlement_dto,
+    a_3_pricing_mechanism_dto,
+    a_4_heuristic_benefit_allocation_dto,
 )
-from u2demo_clearing_engine.dto.algorithm_libraries import commons_dispatch_optimization_dto, commons_dto
+from u2demo_clearing_engine.dto.algorithm_libraries import commons_dto, commons_energy_management_system_dto
 
 if __name__ == "__main__":
     ignored_types = {"datetime", "dict"}
@@ -44,10 +43,10 @@ if __name__ == "__main__":
 
     pp.PydanticParser.__call__ = safe_call
 
-    generator = MermaidGenerator(commons_dispatch_optimization_dto)
+    generator = MermaidGenerator(commons_energy_management_system_dto)
     chart = generator.generate_chart(relations=Relations.Inheritance)
 
-    with open("doc/mermaid_charts/commons_dispatch_optimization_dto.md", "w") as f:
+    with open("doc/mermaid_charts/commons_energy_management_system_dto.md", "w") as f:
         f.write(chart)
 
     generator = MermaidGenerator(commons_dto)
@@ -55,24 +54,24 @@ if __name__ == "__main__":
     with open("doc/mermaid_charts/commons_dto.md", "w") as f:
         f.write(chart)
 
-    generator = MermaidGenerator(a_1_1_centralized_dispatch_cems_dto)
+    generator = MermaidGenerator(a_1_1_energy_management_system_community_dto)
     chart = generator.generate_chart(relations=Relations.Inheritance)
-    with open("doc/mermaid_charts/centralized_dispatch_cems_dto.md", "w") as f:
+    with open("doc/mermaid_charts/energy_management_system_community_dto.md", "w") as f:
         f.write(chart)
 
-    generator = MermaidGenerator(a_1_2_centralized_dispatch_peer_to_peer_dto)
+    generator = MermaidGenerator(a_1_2_energy_management_system_peer_to_peer_dto)
     chart = generator.generate_chart(relations=Relations.Inheritance)
-    with open("doc/mermaid_charts/centralized_dispatch_p2p_dto.md", "w") as f:
+    with open("doc/mermaid_charts/energy_management_system_p2p_dto.md", "w") as f:
         f.write(chart)
 
-    generator = MermaidGenerator(a_1_3_centralized_dispatch_collective_benefit_allocation_dto)
+    generator = MermaidGenerator(a_1_3_energy_management_system_collective_benefit_allocation_dto)
     chart = generator.generate_chart(relations=Relations.Inheritance)
-    with open("doc/mermaid_charts/centralized_dispatch_benefit_allocation_dto.md", "w") as f:
+    with open("doc/mermaid_charts/energy_management_system_collective_benefit_allocation_dto.md", "w") as f:
         f.write(chart)
 
-    generator = MermaidGenerator(a_1_4_decision_individual_portfolio_optimization_dto)
+    generator = MermaidGenerator(a_1_4_energy_management_system_individual_portfolio_dto)
     chart = generator.generate_chart(relations=Relations.Inheritance)
-    with open("doc/mermaid_charts/individual_portfolio_optimisation_dto.md", "w") as f:
+    with open("doc/mermaid_charts/energy_management_system_individual_portfolio_dto.md", "w") as f:
         f.write(chart)
 
     generator = MermaidGenerator(a_2_centralized_market_clearing_dto)
@@ -80,12 +79,12 @@ if __name__ == "__main__":
     with open("doc/mermaid_charts/market_clearing_dto.md", "w") as f:
         f.write(chart)
 
-    generator = MermaidGenerator(a_3_pricing_model_dto)
+    generator = MermaidGenerator(a_3_pricing_mechanism_dto)
     chart = generator.generate_chart(relations=Relations.Inheritance)
-    with open("doc/mermaid_charts/pricing_model_dto.md", "w") as f:
+    with open("doc/mermaid_charts/pricing_mechanism_dto.md", "w") as f:
         f.write(chart)
 
-    generator = MermaidGenerator(a_4_heuristic_settlement_dto)
+    generator = MermaidGenerator(a_4_heuristic_benefit_allocation_dto)
     chart = generator.generate_chart(relations=Relations.Inheritance)
-    with open("doc/mermaid_charts/heuristic_settlement_dto.md", "w") as f:
+    with open("doc/mermaid_charts/heuristic_benefit_allocation_dto.md", "w") as f:
         f.write(chart)

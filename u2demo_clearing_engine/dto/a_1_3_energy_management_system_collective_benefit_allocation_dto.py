@@ -4,15 +4,15 @@ from enum import StrEnum
 
 from pydantic import BaseModel
 
-from u2demo_clearing_engine.dto.algorithm_libraries.commons_dispatch_optimization_dto import (
-    Asset,
-    AssetSchedule,
-)
 from u2demo_clearing_engine.dto.algorithm_libraries.commons_dto import (
     CommunityMember,
     OptimizationInstance,
     Schedule,
     TimeValue,
+)
+from u2demo_clearing_engine.dto.algorithm_libraries.commons_energy_management_system_dto import (
+    Asset,
+    AssetSchedule,
 )
 
 # -------- INPUT STRUCTURES -------- #
@@ -31,7 +31,7 @@ class BehaviouralConstraint(StrEnum):
     NO_CONSTRAINT = "no constraint"  # Sharing coefficients ignored
 
 
-class CentralizedDispatchCollectiveBenefitAllocationInput(OptimizationInstance):
+class EnergyManagementSystemCollectiveBenefitAllocationInput(OptimizationInstance):
     asset: list[Asset]
     asset_dispatches: list[AssetSchedule]
     grid_offtake: list[Schedule]
@@ -51,7 +51,7 @@ class BenefitAllocation(BaseModel):
     ]  # Could also be a Schedule, if talk about redistribution in volumes, rather than % of total benefit. This value could be negative.
 
 
-class CentralizedDispatchCollectiveBenefitAllocationOutput(OptimizationInstance):
+class EnergyManagementSystemCollectiveBenefitAllocationOutput(OptimizationInstance):
     community_total_benefit: float
     benefit_allocations: list[
         BenefitAllocation

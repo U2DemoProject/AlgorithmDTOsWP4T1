@@ -1,5 +1,6 @@
 from datetime import datetime
-from enum import StrEnum
+from enum import IntEnum, StrEnum
+from typing import Annotated, Literal
 
 import loguru as log
 from pydantic import BaseModel, Field, model_validator
@@ -30,7 +31,7 @@ class Asset(BaseModel):
         return 0
 
 
-class VariableAsset(Asset):
+class NonFlexibleAsset(Asset):
     forecasted_profile: Forecast | None = None
 
 
@@ -40,7 +41,7 @@ class FlexAvailability(BaseModel):
     availability: bool
 
 
-class DispatchAsset(Asset):
+class FlexibleAsset(Asset):
     auto_control: bool | None = None
     ramp_rate_kw_per_step: float | None = None
     min_on_duration: float | None = None
@@ -48,7 +49,8 @@ class DispatchAsset(Asset):
     availability_flex: list[FlexAvailability] | None = None
 
 
-class FlexibleLoadAsset(DispatchAsset):
+class FlexibleLoadAsset(FlexibleAsset):
+    type: Literal["flexible_load"] = "flexible_load"
     total_expected_energy_consumption: float | None = None
     baseline_forecast: Forecast | None = (
         None  # Expected operational schedule if no community redispatch is done. For settlement algorithms,  # the forecast is deterministic and corresponds to the physically dispatched schedule.
@@ -56,11 +58,12 @@ class FlexibleLoadAsset(DispatchAsset):
     weight_flexible: float | None = None
 
 
-class NonFlexibleLoadAsset(VariableAsset):
+class NonFlexibleLoadAsset(NonFlexibleAsset):
+    type: Literal["non_flexible_load"] = "non_flexible_load"
     load: list[TimeValue]
 
 
-class StorageDevice(DispatchAsset):
+class StorageDevice(FlexibleAsset):
     max_cycles: int
     charge_efficiency: float | None = 1.0  # Same value used for discharge efficiency.
     self_discharge_rate: float | None = 0.0
@@ -81,24 +84,22 @@ class StorageDevice(DispatchAsset):
         return self
 
 
-class VariableProductionAsset(VariableAsset):
+class VariableProductionAsset(NonFlexibleAsset):
     max_acceptable_curtailment_rate: int | None = (
         None  # Maximum share of PV production which the producer is willing to curtail.
     )
 
 
-class DispatchableProductionAsset(DispatchAsset):
+class DispatchableProductionAsset(FlexibleAsset):
     production_cost: float
 
 
-class Household(BaseModel):
-    community_members: list[CommunityMember]  # Assume that a household can be shared across multiple community members
-    assets: list[Asset]
+class RiskAggressiveness(IntEnum):
+    """RiskAggressiveness represents the risk the member accept to take when he provides a bid."""
 
-
-class HouseEnergyManagementSystem(BaseModel):
-    house: Household
-    meters: list[Meter]
+    LOW = 20
+    MEDIUM = 50
+    HIGH = 80
 
 
 class EnergyCommunityManager(BaseModel):
@@ -123,6 +124,7 @@ class SocValue(BaseModel):
 
 
 class BatteryStorage(StorageDevice):
+    type: Literal["battery_storage"] = "battery_storage"
     weight_cycling: float
     t_target: datetime  # Time by which the minimum target SoC must be achieved
     soc_target: float  # Minimum target SoC
@@ -151,11 +153,13 @@ class ElectricVehicleCharger(FlexibleLoadAsset):
 
 
 class ElectricVehicle(BatteryStorage):
+    type: Literal["electric_vehicle"] = "electric_vehicle"
     charger: ElectricVehicleCharger
     weight_comfort: float
 
 
 class HVAC(FlexibleLoadAsset):
+    type: Literal["hvac"] = "hvac"
     setpoint_temp: float
     max_temp: float
     min_temp: float
@@ -186,5 +190,23 @@ class HVAC(FlexibleLoadAsset):
 
 
 class PV(VariableProductionAsset):
+    type: Literal["pv"] = "pv"
     rated_capacity: float  # Installed PV capacity (in kW)
     weight_curtailment: float  # Cost of solar curtailment
+
+
+AssetType = Annotated[
+    PV | BatteryStorage | ElectricVehicle | HVAC | NonFlexibleLoadAsset | FlexibleLoadAsset,
+    Field(discriminator="type"),
+]
+
+
+class Household(BaseModel):
+    community_members: list[CommunityMember]  # Assume that a household can be shared across multiple community members
+    assets: list[AssetType]
+    risk_aggressiveness: RiskAggressiveness = RiskAggressiveness.MEDIUM
+
+
+class HouseEnergyManagementSystem(BaseModel):
+    house: Household
+    meters: list[Meter]

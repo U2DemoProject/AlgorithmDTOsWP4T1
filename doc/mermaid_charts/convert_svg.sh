@@ -5,7 +5,7 @@
 #!/bin/bash
 
 # Define your list of base names
-names=('commons_dispatch_optimization_dto' 'commons_dto' 'centralized_dispatch_cems_dto' 'centralized_dispatch_p2p_dto' 'centralized_dispatch_benefit_allocation_dto' 'market_clearing_dto' 'pricing_model_dto' 'individual_portfolio_optimisation_dto')
+names=('commons_energy_management_system_dto' 'commons_dto' 'energy_management_system_community_dto' 'energy_management_system_p2p_dto' 'energy_management_system_collective_benefit_allocation_dto' 'energy_management_system_individual_portfolio_dto' 'market_clearing_dto' 'pricing_mechanism_dto' 'heuristic_benefit_allocation_dto')
 
 
 # Loop through each name and generate the SVG

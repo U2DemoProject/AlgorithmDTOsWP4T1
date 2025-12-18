@@ -43,6 +43,7 @@ class Prices(BaseModel):
 class ContractCategory(StrEnum):
     FIXED = "fixed"
     PEAK_OFF_PEAK = "peak_off_peak"
+    ENERGY_MARKET = "energy_market"
 
 
 class Supplier(BaseModel):
@@ -86,6 +87,7 @@ class ObjectiveName(StrEnum):
     SOCIAL_WELFARE = "social_welfare_maximisation"
     CLEARED_VOLUME = "cleared_volume_maximisation"
     COST_MINIMISATION = "cost_minimisation"
+    MAX_VOLUME_SQUARED_DEVIATION = "max_volume_squared_deviation"
     GRID_SUPPLY = "grid_supply_minimisation"
     RENEWABLE_SUPPLY = "renewable_supply_maximisation"
 

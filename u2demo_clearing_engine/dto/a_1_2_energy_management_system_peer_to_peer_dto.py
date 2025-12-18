@@ -5,13 +5,13 @@ from enum import Enum
 
 from pydantic import BaseModel, Field
 
-from u2demo_clearing_engine.dto.algorithm_libraries.commons_dispatch_optimization_dto import Asset
 from u2demo_clearing_engine.dto.algorithm_libraries.commons_dto import (
     CommunityMember,
     OptimizationInstance,
     TimeParameters,
     TimeValue,
 )
+from u2demo_clearing_engine.dto.algorithm_libraries.commons_energy_management_system_dto import Asset
 
 # -------- INPUT STRUCTURES -------- #
 
@@ -69,7 +69,7 @@ class Peer(CommunityMember):
     availability: SharedAvailability
 
 
-class CentralizedDispatchWithP2PModelInput(OptimizationInstance):
+class EnergyManagementSystemP2PInput(OptimizationInstance):
     time_parameters: TimeParameters = TimeParameters(
         timestep_minutes=15, horizon_hours=24, scheduling_time=datetime.datetime.now()
     )
@@ -94,7 +94,7 @@ class PeerResult(BaseModel):
     sharing_distribution: list[PeerSharingCoefficient]
 
 
-class CentralizedDispatchWithP2PModelOutput(OptimizationInstance):
+class EnergyManagementSystemP2POutput(OptimizationInstance):
     peer_results: list[PeerResult]
     electricity_prices: list[
         TimeValue

@@ -1,8 +1,3 @@
-from u2demo_clearing_engine.dto.algorithm_libraries.commons_dispatch_optimization_dto import (
-    AssetSchedule,
-    EnergyCommunityManager,
-    Household,
-)
 from u2demo_clearing_engine.dto.algorithm_libraries.commons_dto import (
     CommunityMember,
     Objective,
@@ -10,11 +5,16 @@ from u2demo_clearing_engine.dto.algorithm_libraries.commons_dto import (
     Schedule,
     TimeParameters,
 )
+from u2demo_clearing_engine.dto.algorithm_libraries.commons_energy_management_system_dto import (
+    AssetSchedule,
+    EnergyCommunityManager,
+    Household,
+)
 
 # -------- INPUT STRUCTURES -------- #
 
 
-class DispatchInput(OptimizationInstance):
+class EnergyManagementSystemCommunityInput(OptimizationInstance):
     time_units: TimeParameters
     households: list[Household]  # Households store the list of physical assets connected to this household
     members: list[CommunityMember]  # Members store the list of meters and contracts connected to this member
@@ -31,7 +31,7 @@ class DispatchInput(OptimizationInstance):
 # Outputs therefore only focus on volumes.
 
 
-class DispatchOutput(OptimizationInstance):
+class EnergyManagementSystemCommunityOutput(OptimizationInstance):
     asset_dispatches: list[AssetSchedule]
     grid_offtake: list[Schedule]
     grid_injection: list[Schedule]

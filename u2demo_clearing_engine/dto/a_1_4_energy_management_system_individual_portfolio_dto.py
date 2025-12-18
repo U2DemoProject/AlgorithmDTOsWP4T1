@@ -4,15 +4,15 @@ from datetime import datetime
 
 from pydantic import BaseModel
 
-from u2demo_clearing_engine.dto.algorithm_libraries.commons_dispatch_optimization_dto import (
-    AssetSchedule,
-    Household,
-)
 from u2demo_clearing_engine.dto.algorithm_libraries.commons_dto import (
     Objective,
     OptimizationInstance,
     Prices,
     Schedule,
+)
+from u2demo_clearing_engine.dto.algorithm_libraries.commons_energy_management_system_dto import (
+    AssetSchedule,
+    Household,
 )
 
 # -------- INPUT STRUCTURES -------- #
@@ -25,7 +25,7 @@ class CommunityContract(BaseModel):
     max_offtake_community: Schedule  # Maximum generation which can be offtaken by the community
 
 
-class DecisionIndividualOptimisationInput(OptimizationInstance):
+class EnergyManagementSystemIndividualPortfolioInput(OptimizationInstance):
     household: Household
     community_contract: CommunityContract | None = None
     objectives: list[Objective] | None = None
@@ -45,6 +45,6 @@ class ExternalInteractions(
     community_injection_volume: Schedule
 
 
-class DecisionIndividualOptimisationOutput(OptimizationInstance):
+class EnergyManagementSystemIndividualPortfolioOutput(OptimizationInstance):
     dispatches: list[AssetSchedule]
     external_interactions: ExternalInteractions

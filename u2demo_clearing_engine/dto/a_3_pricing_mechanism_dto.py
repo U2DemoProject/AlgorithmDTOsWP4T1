@@ -23,7 +23,7 @@ class PricingRule(StrEnum):
     SUPPLY_DEMAND = "Supply-demand ratio"
 
 
-class PricingModelInput(OptimizationInstance):
+class PricingMechanismInput(OptimizationInstance):
     time: TimeParameters
     pricing_rule: PricingRule
     loads: list[TimeValue]
@@ -40,6 +40,6 @@ class BillingReprocessing(BaseModel):
 
 
 #  The same algo is ran twice (with forecast and realized values)
-class PricingModelOutput(OptimizationInstance):
+class PricingMechanismOutput(OptimizationInstance):
     internal_prices: list[TimeValue]
     billing: list[BillingReprocessing]

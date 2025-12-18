@@ -6,23 +6,17 @@ classDiagram
         share: float
     }
 
-    class OptimizationInstance {
-        instance_id: str
-    }
-
-    class HeuristicSettlementInput {
-        sharing_keys: list[ContractShare]
-        community_member_schedules: list[CommunityMemberGridSchedule]
-        total_benefit: float
-    }
-
     class CommunityMember {
         id: str
         meters: list[Meter]
     }
 
-    class HeuristicSettlementOutput {
-        member_benefits: list[CommunityMemberBenefit]
+    class OptimizationInstance {
+        instance_id: str
+    }
+
+    class Schedule {
+        schedule: list[TimeValue]
     }
 
     class CommunityMemberGridSchedule {
@@ -31,8 +25,14 @@ classDiagram
         grid_injection: list[Schedule]
     }
 
-    class Schedule {
-        schedule: list[TimeValue]
+    class HeuristicBenefitAllocationInput {
+        sharing_keys: list[ContractShare]
+        community_member_schedules: list[CommunityMemberGridSchedule]
+        total_benefit: float
+    }
+
+    class HeuristicBenefitAllocationOutput {
+        member_benefits: list[CommunityMemberBenefit]
     }
 
     class CommunityMemberBenefit {
@@ -43,7 +43,7 @@ classDiagram
     }
 
 
-    OptimizationInstance <|-- HeuristicSettlementInput
-    OptimizationInstance <|-- HeuristicSettlementOutput
+    OptimizationInstance <|-- HeuristicBenefitAllocationInput
+    OptimizationInstance <|-- HeuristicBenefitAllocationOutput
 
 ```

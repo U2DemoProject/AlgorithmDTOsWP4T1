@@ -18,7 +18,7 @@ class CommunityMemberGridSchedule(BaseModel):
     grid_injection: list[Schedule]  # The injection schedule is provided for each community member
 
 
-class HeuristicSettlementInput(OptimizationInstance):
+class HeuristicBenefitAllocationInput(OptimizationInstance):
     sharing_keys: list[ContractShare]
     community_member_schedules: list[CommunityMemberGridSchedule]
     total_benefit: float
@@ -35,5 +35,5 @@ class CommunityMemberBenefit(BaseModel):
 
 
 #  The same algo is ran twice (with forecast and realized values)
-class HeuristicSettlementOutput(OptimizationInstance):
+class HeuristicBenefitAllocationOutput(OptimizationInstance):
     member_benefits: list[CommunityMemberBenefit]

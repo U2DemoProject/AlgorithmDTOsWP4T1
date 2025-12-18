@@ -2,20 +2,20 @@ from __future__ import annotations
 
 from datetime import datetime
 from enum import StrEnum
+from typing import Self
 
 from pydantic import BaseModel, Field, model_validator
-from typing_extensions import Self
 
 from u2demo_clearing_engine.dto.a_2_centralized_market_clearing_pricing_model_dto import ClearingPriceModel
-from u2demo_clearing_engine.dto.algorithm_libraries.commons_dto import ObjectiveName, OptimizationInstance
+from u2demo_clearing_engine.dto.algorithm_libraries.commons_dto import ObjectiveName, OptimizationInstance, TimeValue
 
 # Classes specific to model 4
 
 
 class OrderStep(BaseModel):  # Simple single-step bid structure
-    volume_min: float = Field(..., ge=0, description="Minimum volume in MWh.")
-    volume_max: float = Field(..., ge=0, description="Maximum volume in MWh.")
-    price: float = Field(..., ge=0, description="Price in €/MWh.")
+    volume_min: float = Field(..., ge=0, description="Minimum volume in kWh.")
+    volume_max: float = Field(..., ge=0, description="Maximum volume in kWh.")
+    price: float = Field(..., description="Price in €/kWh.")
 
     @model_validator(mode="after")
     def check_order_step(self) -> Self:
@@ -107,8 +107,8 @@ class MarketClearingInput(OptimizationInstance):
 
 # Outputs of class
 class TimeStepClearedOrder(TimeStepOrder):
-    cleared_volume: float = Field(..., ge=0, description="Cleared volume in MWh.")
-    cleared_price: float = Field(..., ge=0, description="Cleared price in €/MWh.")
+    cleared_volume: float = Field(..., ge=0, description="Cleared volume in kWh.")
+    cleared_price: float = Field(..., description="Cleared price in €/kWh.")
 
 
 class ClearedOrder(BaseModel):
@@ -119,4 +119,4 @@ class ClearedOrder(BaseModel):
 
 class MarketClearingOutput(OptimizationInstance):
     cleared_orders: list[ClearedOrder]
-    clearing_price: list[float | None]
+    clearing_price: list[TimeValue]
