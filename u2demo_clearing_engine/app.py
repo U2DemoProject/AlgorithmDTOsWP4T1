@@ -37,14 +37,14 @@ def run_dispatch_p2p(input_data: EnergyManagementSystemP2PInput) -> EnergyManage
     pass
 
 
-@app.post("/centralized_dispatch_benefit_allocation")
+@app.post("/energy_management_system_benefit_allocation")
 def run_dispatch_benefit_allocation(
     input_data: EnergyManagementSystemCollectiveBenefitAllocationInput,
 ) -> EnergyManagementSystemCollectiveBenefitAllocationOutput:  # noqa: ARG001
     pass
 
 
-@app.post("/individual_portfolio_optimisation")
+@app.post("/energy_management_system_individual_portfolio_optimisation")
 def run_individual_portfolio_optimisation(
     input_data: EnergyManagementSystemIndividualPortfolioInput,
 ) -> EnergyManagementSystemIndividualPortfolioOutput:  # noqa: ARG001

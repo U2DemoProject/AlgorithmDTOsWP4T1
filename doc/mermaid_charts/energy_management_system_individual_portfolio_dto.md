@@ -1,8 +1,15 @@
 ```mermaid
 classDiagram
 
-    class OptimizationInstance {
-        instance_id: str
+    class CommunityContract {
+        supply_prices: Prices
+        resale_prices: Prices
+        max_supply_community: Schedule
+        max_offtake_community: Schedule
+    }
+
+    class Prices {
+        prices: list[TimeValue]
     }
 
     class Household {
@@ -13,6 +20,11 @@ classDiagram
 
     class Schedule {
         schedule: list[TimeValue]
+    }
+
+    class EnergyManagementSystemIndividualPortfolioOutput {
+        dispatches: list[AssetSchedule]
+        external_interactions: ExternalInteractions
     }
 
     class EnergyManagementSystemIndividualPortfolioInput {
@@ -30,25 +42,8 @@ classDiagram
         community_injection_volume: Schedule
     }
 
-    class CommunityContract {
-        supply_prices: Prices
-        resale_prices: Prices
-        max_supply_community: Schedule
-        max_offtake_community: Schedule
-    }
-
-    class AssetSchedule {
-        asset_id: str
-        direction: Direction
-    }
-
-    class EnergyManagementSystemIndividualPortfolioOutput {
-        dispatches: list[AssetSchedule]
-        external_interactions: ExternalInteractions
-    }
-
-    class Prices {
-        prices: list[TimeValue]
+    class OptimizationInstance {
+        instance_id: str
     }
 
     class Objective {
@@ -56,8 +51,14 @@ classDiagram
         weight: float | None = 1
     }
 
+    class AssetSchedule {
+        asset_id: str
+        direction: Direction
+    }
 
-    OptimizationInstance <|-- EnergyManagementSystemIndividualPortfolioInput
+
+    Schedule <|-- AssetSchedule
     OptimizationInstance <|-- EnergyManagementSystemIndividualPortfolioOutput
+    OptimizationInstance <|-- EnergyManagementSystemIndividualPortfolioInput
 
 ```

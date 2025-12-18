@@ -1,19 +1,18 @@
 ```mermaid
 classDiagram
 
-    class EnergyManagementSystemCommunityOutput {
-        asset_dispatches: list[AssetSchedule]
-        grid_offtake: list[Schedule]
-        grid_injection: list[Schedule]
+    class Objective {
+        name: ObjectiveName
+        weight: float | None = 1
     }
 
-    class OptimizationInstance {
-        instance_id: str
-    }
-
-    class CommunityMember {
-        id: str
-        meters: list[Meter]
+    class EnergyManagementSystemCommunityInput {
+        time_units: TimeParameters
+        households: list[Household]
+        members: list[CommunityMember]
+        objective: list[Objective]
+        community_manager: EnergyCommunityManager
+        schedules: list[AssetSchedule]
     }
 
     class Household {
@@ -26,18 +25,10 @@ classDiagram
         schedule: list[TimeValue]
     }
 
-    class EnergyManagementSystemCommunityInput {
-        time_units: TimeParameters
-        households: list[Household]
-        members: list[CommunityMember]
-        objective: list[Objective]
-        community_manager: EnergyCommunityManager
-        schedules: list[AssetSchedule]
-    }
-
-    class EnergyCommunityManager {
-        id: str
-        contract: Contract
+    class EnergyManagementSystemCommunityOutput {
+        asset_dispatches: list[AssetSchedule]
+        grid_offtake: list[Schedule]
+        grid_injection: list[Schedule]
     }
 
     class TimeParameters {
@@ -46,17 +37,27 @@ classDiagram
         scheduling_time: datetime
     }
 
+    class OptimizationInstance {
+        instance_id: str
+    }
+
+    class EnergyCommunityManager {
+        id: str
+        contract: Contract
+    }
+
+    class CommunityMember {
+        id: str
+        meters: list[Meter]
+    }
+
     class AssetSchedule {
         asset_id: str
         direction: Direction
     }
 
-    class Objective {
-        name: ObjectiveName
-        weight: float | None = 1
-    }
 
-
+    Schedule <|-- AssetSchedule
     OptimizationInstance <|-- EnergyManagementSystemCommunityOutput
     OptimizationInstance <|-- EnergyManagementSystemCommunityInput
 

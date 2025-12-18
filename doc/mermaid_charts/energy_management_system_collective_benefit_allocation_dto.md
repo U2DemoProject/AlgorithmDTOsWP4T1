@@ -1,22 +1,21 @@
 ```mermaid
 classDiagram
 
-    class OptimizationInstance {
-        instance_id: str
+    class BehaviouralConstraint {
+        <<Enumeration>>
+        HARD_CONSTRAINT: str = 'hard constraint'
+        SOFT_CONSTRAINT: str = 'soft constraint'
+        NO_CONSTRAINT: str = 'no constraint'
     }
 
-    class CommunityMember {
-        id: str
-        meters: list[Meter]
-    }
-
-    class BenefitAllocation {
+    class BehaviouralWeight {
         id: CommunityMember
-        sharing_coefficient_result: list[TimeValue]
+        sharing_coefficient: float
     }
 
-    class Schedule {
-        schedule: list[TimeValue]
+    class TimeValue {
+        time: datetime
+        value: float
     }
 
     class EnergyManagementSystemCollectiveBenefitAllocationInput {
@@ -29,35 +28,17 @@ classDiagram
         behavioural_constraint: BehaviouralConstraint
     }
 
-    class BehaviouralWeight {
+    class Schedule {
+        schedule: list[TimeValue]
+    }
+
+    class BenefitAllocation {
         id: CommunityMember
-        sharing_coefficient: float
-    }
-
-    class BehaviouralConstraint {
-        <<Enumeration>>
-        HARD_CONSTRAINT: str = 'hard constraint'
-        SOFT_CONSTRAINT: str = 'soft constraint'
-        NO_CONSTRAINT: str = 'no constraint'
-    }
-
-    class EnergyManagementSystemCollectiveBenefitAllocationOutput {
-        community_total_benefit: float
-        benefit_allocations: list[BenefitAllocation]
+        sharing_coefficient_result: list[TimeValue]
     }
 
     class StrEnum {
         <<Enumeration>>
-    }
-
-    class TimeValue {
-        time: datetime
-        value: float
-    }
-
-    class AssetSchedule {
-        asset_id: str
-        direction: Direction
     }
 
     class Asset {
@@ -68,7 +49,27 @@ classDiagram
         context: dict = dict
     }
 
+    class OptimizationInstance {
+        instance_id: str
+    }
 
+    class EnergyManagementSystemCollectiveBenefitAllocationOutput {
+        community_total_benefit: float
+        benefit_allocations: list[BenefitAllocation]
+    }
+
+    class CommunityMember {
+        id: str
+        meters: list[Meter]
+    }
+
+    class AssetSchedule {
+        asset_id: str
+        direction: Direction
+    }
+
+
+    Schedule <|-- AssetSchedule
     StrEnum <|-- BehaviouralConstraint
     OptimizationInstance <|-- EnergyManagementSystemCollectiveBenefitAllocationInput
     OptimizationInstance <|-- EnergyManagementSystemCollectiveBenefitAllocationOutput
